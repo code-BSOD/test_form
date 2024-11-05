@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3rd Party Input Data Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .url-group {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0; 
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>3rd Party Input Data Form</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <!-- Month-Year Fields -->
+            <div class="form-group">
+                <label for="date">Campaign Month-Year</label>
+                <input type="month" class="form-control" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                {{ form.channel_type.label }}
+                {{ form.channel_type(class="form-control", onchange="toggleEmailFields()") }}
+            </div>
+            <div class="form-group">
+                {{ form.cost.label }}
+                <div class="input-group">
+                    {{ form.cost(class="form-control", placeholder="Enter cost in Euro", onfocus="this.placeholder=''", onblur="this.placeholder='Enter cost in Euro'") }}
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" data-toggle="tooltip" data-placement="top" title="Only Input Cost in Euro. If Campaign is Free, enter 0">
+                            ?
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivered Emails Field -->
+            <div class="form-group" id="delivered-emails-group" style="display: none;">
+                {{ form.delivered_emails.label }}
+                {{ form.delivered_emails(class="form-control") }}
+            </div>
+
+            <!-- New Fields -->
+            <div class="form-group">
+                {{ form.region.label }}
+                {{ form.region(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.campaign_name.label }}
+                {{ form.campaign_name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.purpose_of_activity.label }}
+                {{ form.purpose_of_activity(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.description.label }}
+                {{ form.description(class="form-control", rows="3") }}
+            </div>
+            <div class="form-group">
+                {{ form.registration.label }}
+                {{ form.registration(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.comment.label }}
+                {{ form.comment(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.added_by.label }}
+                {{ form.added_by(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.date_added.label }}
+                {{ form.date_added(class="form-control") }}
+            </div>
+
+            <!-- URL Fields -->
+            <div class="form-group" id="urls-container">
+                {{ form.urls.label }}
+                <div class="url-group mb-3">
+                    <label for="urls-0-url">URL 1</label>
+                    <input type="text" class="form-control" id="urls-0-url" name="urls-0-url" required>
+                    <label for="urls-0-clicks">Clicks for URL 1</label>
+                    <input type="number" class="form-control" id="urls-0-clicks" name="urls-0-clicks" min="0">
+                    <label for="urls-0-impressions">Impressions for URL 1</label>
+                    <input type="number" class="form-control" id="urls-0-impressions" name="urls-0-impressions" min="0">
+                    <div class="email-fields" style="display: none;">
+                        <label for="urls-0-unique_clickthroughs">Unique Clickthroughs for URL 1</label>
+                        <input type="number" class="form-control" id="urls-0-unique_clickthroughs" name="urls-0-unique_clickthroughs" min="0">
+                        <label for="urls-0-unique_open">Unique Open for URL 1</label>
+                        <input type="number" class="form-control" id="urls-0-unique_open" name="urls-0-unique_open" min="0">
+                        <label for="urls-0-opens">Opens for URL 1</label>
+                        <input type="number" class="form-control" id="urls-0-opens" name="urls-0-opens" min="0">
+                    </div>
+                    <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeUrlField(this)">Remove URL</button>
+                </div>
+            </div> 
+            <button type="button" class="btn btn-secondary" onclick="addUrlField()">Add URL</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        // Tooltip initialization
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip(); 
+        });
+
+        function addUrlField() {
+            const container = document.getElementById('urls-container');
+            const newField = document.createElement('div');
+            newField.classList.add('url-group', 'mb-3');
+
+            const index = container.querySelectorAll('.url-group').length;
+            newField.innerHTML = `
+                <label for="urls-${index}-url">URL ${index + 1}</label>
+                <input type="text" class="form-control" id="urls-${index}-url" name="urls-${index}-url" required>
+                <label for="urls-${index}-clicks">Clicks for URL ${index + 1}</label>
+                <input type="number" class="form-control" id="urls-${index}-clicks" name="urls-${index}-clicks" min="0">
+                <label for="urls-${index}-impressions">Impressions for URL ${index + 1}</label>
+                <input type="number" class="form-control" id="urls-${index}-impressions" name="urls-${index}-impressions" min="0">
+                <div class="email-fields" style="display: none;">
+                    <label for="urls-${index}-unique_clickthroughs">Unique Clickthroughs for URL ${index + 1}</label>
+                    <input type="number" class="form-control" id="urls-${index}-unique_clickthroughs" name="urls-${index}-unique_clickthroughs" min="0">
+                    <label for="urls-${index}-unique_open">Unique Open for URL ${index + 1}</label>
+                    <input type="number" class="form-control" id="urls-${index}-unique_open" name="urls-${index}-unique_open" min="0">
+                    <label for="urls-${index}-opens">Opens for URL ${index + 1}</label>
+                    <input type="number" class="form-control" id="urls-${index}-opens" name="urls-${index}-opens" min="0">
+                </div>
+                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeUrlField(this)">Remove URL</button>
+            `;
+            container.appendChild(newField);
+            toggleEmailFields();
+        }
+
+        function removeUrlField(button) {
+            const urlGroup = button.closest('.url-group');
+            urlGroup.classList.add('fade-out');
+            setTimeout(() => {
+                urlGroup.remove();
+            }, 500);
+        }
+
+        function toggleEmailFields() {
+            const channelType = document.getElementById('{{ form.channel_type.id }}').value;
+            const urlGroups = document.querySelectorAll('.url-group');
+            const deliveredEmailsGroup = document.getElementById('delivered-emails-group');
+
+            // Toggle the display of delivered emails field
+            deliveredEmailsGroup.style.display = channelType === 'Email' ? 'block' : 'none';
+
+            // Toggle email fields for URLs
+            urlGroups.forEach((group) => {
+                const emailFields = group.querySelector('.email-fields');
+                emailFields.style.display = channelType === 'Email' ? 'block' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleEmailFields();  // Initialize visibility of email fields based on channel type
+        });
+    </script>
+
+    <!-- Add jQuery and Bootstrap JS for tooltip functionality -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
